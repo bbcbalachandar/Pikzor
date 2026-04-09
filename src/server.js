@@ -66,6 +66,12 @@ app.use('/blog',    blogRouter);
 app.get('/docs', (_req, res) =>
   res.sendFile(path.join(__dirname, '../public/docs.html')));
 
+app.get('/dashboard', (_req, res) =>
+  res.sendFile(path.join(__dirname, '../public/dashboard.html')));
+
+app.get('/checker', (_req, res) =>
+  res.sendFile(path.join(__dirname, '../public/checker.html')));
+
 app.get('/health', (_req, res) =>
   res.json({ status: 'ok', uptime: process.uptime(), ts: new Date().toISOString() }));
 
