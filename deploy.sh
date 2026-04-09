@@ -6,7 +6,7 @@
 
 set -e
 
-SERVER="ubuntu@YOUR_VM_IP"   # <-- change this
+SERVER="ubuntu@20.81.212.232"
 APP_DIR="/home/pikzor/app"
 
 echo "==> Deploying to $SERVER:$APP_DIR"
