@@ -19,7 +19,7 @@ echo "==> Installing Chrome / Puppeteer system dependencies"
 apt-get install -y --no-install-recommends \
     ca-certificates \
     fonts-liberation \
-    libasound2 \
+    libasound2t64 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
     libcairo2 \

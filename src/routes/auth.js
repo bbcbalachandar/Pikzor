@@ -48,12 +48,14 @@ router.post('/signup', byIp, async (req, res) => {
     const user = db.getUserById.get(id);
     const token = signJwt(user);
 
-    res.status(201).json({
-      token,
-      user: safeUser(user),
-    });
+    res.status(201).json({ token, user: safeUser(user) });
+
+    // Fire-and-forget welcome email
+    const email = require('../services/email');
+    email.sendWelcome(user.email).catch(() => {});
   } catch (err) {
-    console.error('[auth/signup]', err);
+    const logger = require('../utils/logger');
+    logger.error('[auth/signup]', err);
     res.status(500).json({ error: 'Signup failed' });
   }
 });
@@ -238,6 +240,54 @@ router.get('/usage', requireJwt, (req, res) => {
     plan,
     month,
   });
+});
+
+// ── POST /auth/forgot-password ────────────────────────────────────────────────
+router.post('/forgot-password', byIp, async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'email is required' });
+
+  // Always return 200 to avoid leaking whether email exists
+  res.json({ message: 'If that email is registered you will receive a reset link.' });
+
+  const user = db.getUserByEmail.get(email.toLowerCase());
+  if (!user) return;
+
+  try {
+    const token     = crypto.randomBytes(32).toString('hex');
+    const expiresAt = Math.floor(Date.now() / 1000) + 60 * 60; // 1 hour
+    db.createResetToken.run({ token, user_id: user.id, expires_at: expiresAt });
+
+    const email_service = require('../services/email');
+    await email_service.sendPasswordReset(user.email, token);
+  } catch (err) {
+    const logger = require('../utils/logger');
+    logger.error('[auth/forgot-password]', err);
+  }
+});
+
+// ── POST /auth/reset-password ─────────────────────────────────────────────────
+router.post('/reset-password', async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) return res.status(400).json({ error: 'token and password are required' });
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+
+  const row = db.getResetToken.get(token);
+  if (!row) return res.status(400).json({ error: 'Invalid or expired reset token' });
+  if (row.expires_at < Math.floor(Date.now() / 1000)) {
+    return res.status(400).json({ error: 'Reset token has expired' });
+  }
+
+  try {
+    const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    db.updateUserPassword.run({ password_hash: passwordHash, id: row.user_id });
+    db.markResetTokenUsed.run(token);
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    const logger = require('../utils/logger');
+    logger.error('[auth/reset-password]', err);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
 });
 
 // ── Helper ────────────────────────────────────────────────────────────────────

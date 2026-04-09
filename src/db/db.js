@@ -164,6 +164,25 @@ const recordRender = db.transaction((userId, templateId, cached) => {
   });
 });
 
+// ── Password Reset ────────────────────────────────────────────────────────────
+
+const createResetToken = db.prepare(`
+  INSERT INTO password_reset_tokens (token, user_id, expires_at)
+  VALUES (@token, @user_id, @expires_at)
+`);
+
+const getResetToken = db.prepare(`
+  SELECT * FROM password_reset_tokens WHERE token = ? AND used = 0
+`);
+
+const markResetTokenUsed = db.prepare(`
+  UPDATE password_reset_tokens SET used = 1 WHERE token = ?
+`);
+
+const updateUserPassword = db.prepare(`
+  UPDATE users SET password_hash = @password_hash, updated_at = unixepoch() WHERE id = @id
+`);
+
 module.exports = {
   db,
   // users
@@ -177,4 +196,6 @@ module.exports = {
   createUserTemplate, listUserTemplates, updateUserTemplate, deleteUserTemplate,
   // usage
   recordRender, getUsageMonthly,
+  // password reset
+  createResetToken, getResetToken, markResetTokenUsed, updateUserPassword,
 };

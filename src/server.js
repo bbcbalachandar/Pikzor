@@ -15,9 +15,17 @@ const authRouter     = require('./routes/auth');
 const apiRouter      = require('./routes/api');
 const checkerRouter  = require('./routes/checker');
 const blogRouter     = require('./routes/blog');
+const billingRouter  = require('./routes/billing');
+const uploadRouter   = require('./routes/upload');
+const requestLogger  = require('./middleware/requestLogger');
 
 // ── Ensure runtime directories exist ─────────────────────────────────────────
-for (const dir of [config.storage.dir, config.logs.dir, path.dirname(config.db.path)]) {
+for (const dir of [
+  config.storage.dir,
+  path.join(config.storage.dir, 'logos'),
+  config.logs.dir,
+  path.dirname(config.db.path),
+]) {
   fs.mkdirSync(path.resolve(dir), { recursive: true });
 }
 
@@ -39,13 +47,18 @@ app.use('/api', cors({ origin: '*', methods: ['GET', 'POST', 'PATCH', 'DELETE', 
 // /checker/* — allow all origins
 app.use('/checker', cors({ origin: '*' }));
 
+// /upload/* — allow all origins (called from dashboard JS)
+app.use('/upload', cors({ origin: '*', methods: ['POST', 'OPTIONS'] }));
+
 // /auth/*, /billing/*, /dashboard/* — same-origin only (no CORS header = browser blocks cross-origin)
 
 // ── General middleware ────────────────────────────────────────────────────────
 app.use(compression());
 app.use(express.json());
+app.use(requestLogger);
 
 // ── Static files ──────────────────────────────────────────────────────────────
+// logos sub-directory — served under /images/logos/
 app.use('/images', express.static(path.resolve(config.storage.dir), {
   maxAge: '30d',
   immutable: true,
@@ -62,11 +75,19 @@ app.use('/auth',    authRouter);
 app.use('/api/v1',  apiRouter);
 app.use('/checker', checkerRouter);
 app.use('/blog',    blogRouter);
+app.use('/billing', billingRouter);
+app.use('/upload',  uploadRouter);
 
 app.get('/docs', (_req, res) =>
   res.sendFile(path.join(__dirname, '../public/docs.html')));
 
 app.get('/dashboard', (_req, res) =>
+  res.sendFile(path.join(__dirname, '../public/dashboard.html')));
+
+app.get('/signup', (_req, res) =>
+  res.sendFile(path.join(__dirname, '../public/dashboard.html')));
+
+app.get('/login', (_req, res) =>
   res.sendFile(path.join(__dirname, '../public/dashboard.html')));
 
 app.get('/checker', (_req, res) =>
