@@ -1,0 +1,16 @@
+{
+  "id": "og-gradient",
+  "name": "OG Gradient",
+  "description": "Brand color gradient fading to dark. High contrast, modern.",
+  "width": 1200,
+  "height": 630,
+  "variables": [
+    { "key": "title",       "label": "Post Title",   "required": true  },
+    { "key": "author",      "label": "Author Name",  "required": false, "default": "" },
+    { "key": "date",        "label": "Publish Date", "required": false, "default": "" },
+    { "key": "tag",         "label": "Tag / Category", "required": false, "default": "Blog Post" },
+    { "key": "brand_color", "label": "Brand Color",  "required": false, "default": "#6366f1" },
+    { "key": "logo_url",    "label": "Logo URL",     "required": false, "default": "" },
+    { "key": "domain",      "label": "Domain",       "required": false, "default": "" }
+  ]
+}

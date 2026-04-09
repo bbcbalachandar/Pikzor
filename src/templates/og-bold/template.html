@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+      background: {{brand_color}};
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Concentric rings for depth */
+    .rings {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .ring-1 { width: 500px;  height: 500px; }
+    .ring-2 { width: 780px;  height: 780px; }
+    .ring-3 { width: 1060px; height: 1060px; }
+
+    /* Radial light */
+    .radial {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(255,255,255,0.12) 0%, transparent 65%);
+    }
+
+    /* Corner darkening */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%);
+    }
+
+    .layout {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 100px;
+      gap: 0;
+      max-width: 1000px;
+    }
+
+    .logo-wrap {
+      margin-bottom: 28px;
+    }
+
+    .logo-img {
+      height: 44px;
+      max-width: 180px;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: -0.3px;
+    }
+
+    .title {
+      font-size: {{title_size}}px;
+      font-weight: 900;
+      line-height: 1.12;
+      color: #ffffff;
+      letter-spacing: -2px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      text-shadow: 0 2px 30px rgba(0,0,0,0.2);
+      margin-bottom: 32px;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 22px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.92);
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(4px);
+    }
+
+    .tag-pill::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.8);
+    }
+
+    /* Author strip at bottom */
+    .author-strip {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 72px;
+      background: rgba(0,0,0,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 1.5px solid rgba(255,255,255,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .author-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .sep {
+      font-size: 14px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .date {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+    }
+  </style>
+</head>
+<body>
+  <div class="rings">
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+    <div class="ring ring-3"></div>
+  </div>
+  <div class="radial"></div>
+  <div class="vignette"></div>
+
+  <div class="layout">
+    <div class="logo-wrap">{{logo_html}}</div>
+    <h1 class="title">{{title}}</h1>
+    <span class="tag-pill">{{tag}}</span>
+  </div>
+
+  <div class="author-strip">
+    <div class="avatar">{{author_initial}}</div>
+    <span class="author-name">{{author}}</span>
+    <span class="sep">·</span>
+    <span class="date">{{date}}</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docs — Pikzor</title>
+  <meta name="description" content="Full API reference and integration guide for Pikzor OG image generation.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+           background: #0a0a0f; color: #e2e8f0; line-height: 1.7; display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+               overflow-y: auto; border-right: 1px solid #1e293b;
+               background: #0a0a0f; padding: 2rem 1.25rem; }
+    .sidebar-brand { font-weight: 800; font-size: 1.1rem; color: #fff; margin-bottom: 2rem;
+                     display: block; text-decoration: none; }
+    .sidebar nav { display: flex; flex-direction: column; gap: 0.15rem; }
+    .nav-section { font-size: 0.7rem; font-weight: 700; color: #475569; text-transform: uppercase;
+                   letter-spacing: 0.08em; margin: 1.25rem 0 0.4rem; }
+    .sidebar a { color: #94a3b8; font-size: 0.875rem; padding: 0.3rem 0.6rem;
+                 border-radius: 5px; text-decoration: none; transition: all 0.15s; }
+    .sidebar a:hover, .sidebar a.active { background: #1e293b; color: #f1f5f9; }
+
+    /* ── Main ── */
+    .main { flex: 1; min-width: 0; padding: 3rem 4rem; max-width: 860px; }
+
+    h1 { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; margin: 3rem 0 1rem;
+         padding-top: 3rem; border-top: 1px solid #1e293b; scroll-margin-top: 2rem; }
+    h2:first-of-type { border-top: none; padding-top: 0; margin-top: 2rem; }
+    h3 { font-size: 1.05rem; font-weight: 600; color: #f1f5f9; margin: 2rem 0 0.75rem; }
+    p { color: #94a3b8; margin-bottom: 1rem; }
+    ul, ol { color: #94a3b8; margin: 0 0 1rem 1.5rem; }
+    li { margin-bottom: 0.35rem; }
+    strong { color: #f1f5f9; }
+    a { color: #818cf8; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Code ── */
+    code { background: #1e293b; color: #818cf8; padding: 0.15em 0.4em;
+           border-radius: 4px; font-size: 0.88em; font-family: 'Fira Code', 'Cascadia Code', monospace; }
+    pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;
+          padding: 1.25rem 1.5rem; margin: 1rem 0 1.5rem; overflow-x: auto; }
+    pre code { background: none; color: #e2e8f0; padding: 0; font-size: 0.875rem; line-height: 1.7; }
+
+    /* ── Callouts ── */
+    .callout { border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0;
+               font-size: 0.9rem; border-left: 3px solid; }
+    .callout-info  { background: #0f172a; border-color: #818cf8; color: #a5b4fc; }
+    .callout-warn  { background: #1c1410; border-color: #f59e0b; color: #fcd34d; }
+    .callout-info strong, .callout-warn strong { color: inherit; }
+
+    /* ── Tables ── */
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.9rem; }
+    th { background: #0f172a; color: #f1f5f9; font-weight: 600; padding: 0.65rem 1rem;
+         text-align: left; border-bottom: 2px solid #1e293b; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1e293b; color: #94a3b8; }
+    td code { font-size: 0.82em; }
+
+    /* ── Method badges ── */
+    .endpoint { display: flex; align-items: center; gap: 0.75rem; margin: 1.5rem 0 0.75rem;
+                padding: 0.75rem 1rem; background: #0f172a; border-radius: 8px;
+                border: 1px solid #1e293b; font-family: 'Fira Code', monospace; font-size: 0.875rem; }
+    .method { font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.75rem; }
+    .get  { background: #064e3b; color: #34d399; }
+    .post { background: #1e1b4b; color: #818cf8; }
+    .del  { background: #4c0519; color: #fb7185; }
+    .patch { background: #431407; color: #fb923c; }
+    .path { color: #f1f5f9; }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid #1e293b; }
+    .tab-btn { background: none; border: none; color: #64748b; padding: 0.6rem 1rem;
+               cursor: pointer; font-size: 0.85rem; border-bottom: 2px solid transparent;
+               margin-bottom: -1px; transition: all 0.15s; }
+    .tab-btn.active { color: #818cf8; border-bottom-color: #818cf8; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Mobile ── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 2rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sidebar ─────────────────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <a href="/" class="sidebar-brand">Pikzor</a>
+  <nav>
+    <span class="nav-section">Getting Started</span>
+    <a href="#quick-start">Quick Start</a>
+    <a href="#url-based">URL-Based Usage</a>
+
+    <span class="nav-section">Integration</span>
+    <a href="#html">HTML / Static Sites</a>
+    <a href="#nextjs">Next.js</a>
+    <a href="#javascript">JavaScript</a>
+
+    <span class="nav-section">API Reference</span>
+    <a href="#api-render">POST /api/v1/render</a>
+    <a href="#auth">Authentication</a>
+    <a href="#setup">Setup Endpoints</a>
+    <a href="#usage">Usage Endpoint</a>
+
+    <span class="nav-section">Reference</span>
+    <a href="#templates">Templates</a>
+    <a href="#params">URL Parameters</a>
+    <a href="#plans">Plans &amp; Limits</a>
+    <a href="#caching">Caching</a>
+
+    <span class="nav-section">Tools</span>
+    <a href="/checker.html">OG Checker ↗</a>
+    <a href="/dashboard.html">Dashboard ↗</a>
+  </nav>
+</aside>
+
+<!-- ── Main content ─────────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <h1>Pikzor Documentation</h1>
+  <p>Generate branded OG images for every page on your site — no design tools, no image hosting, no per-post manual work.</p>
+
+  <!-- ── Quick Start ── -->
+  <h2 id="quick-start">Quick Start</h2>
+
+  <p>You can be up and running in under 5 minutes:</p>
+  <ol>
+    <li><strong>Sign up</strong> at <a href="/dashboard.html">pikzor.com/dashboard</a></li>
+    <li><strong>Choose a template</strong> and enter your brand color</li>
+    <li><strong>Copy your token URL</strong> — it looks like <code>/og/t_xK9mP2</code></li>
+    <li><strong>Add it to your site</strong> as the <code>og:image</code> meta tag</li>
+  </ol>
+
+  <p>Your OG image URL looks like this:</p>
+  <pre><code>https://pikzor.com/og/t_xK9mP2?title=My+Post+Title&amp;author=Jane</code></pre>
+
+  <p>That's it. Pikzor generates the image on first request and caches it for 30 days.</p>
+
+  <div class="callout callout-info">
+    <strong>No token yet?</strong> Use <code>/og/test?template=og-gradient&amp;title=Hello</code> to try the renderer without signing up.
+  </div>
+
+  <!-- ── URL-Based Usage ── -->
+  <h2 id="url-based">URL-Based Usage</h2>
+
+  <p>The simplest way to use Pikzor is by constructing a URL with query parameters. No API key needed for your own token.</p>
+
+  <div class="endpoint">
+    <span class="method get">GET</span>
+    <span class="path">/og/:token?title=...&amp;author=...&amp;date=...</span>
+  </div>
+
+  <h3>Example</h3>
+  <pre><code>GET /og/t_xK9mP2?title=How+I+Deployed+in+5+Minutes&author=Jane+Doe&date=April+5%2C+2026</code></pre>
+
+  <p>Returns a <code>1200×630</code> PNG image. The response includes:</p>
+  <ul>
+    <li><code>Content-Type: image/png</code></li>
+    <li><code>Cache-Control: public, max-age=2592000, immutable</code></li>
+    <li><code>X-Cache: HIT</code> or <code>MISS</code></li>
+  </ul>
+
+  <!-- ── HTML ── -->
+  <h2 id="html">HTML / Static Sites</h2>
+
+  <p>Add these tags inside your <code>&lt;head&gt;</code>. Works with any static site generator (Astro, Hugo, Eleventy, plain HTML):</p>
+
+  <pre><code>&lt;meta property="og:title" content="My Post Title" /&gt;
+&lt;meta property="og:description" content="A short description." /&gt;
+&lt;meta property="og:image"
+  content="https://pikzor.com/og/t_xK9mP2?title=My+Post+Title&amp;author=Jane" /&gt;
+&lt;meta property="og:image:width" content="1200" /&gt;
+&lt;meta property="og:image:height" content="630" /&gt;
+&lt;meta name="twitter:card" content="summary_large_image" /&gt;
+&lt;meta name="twitter:image"
+  content="https://pikzor.com/og/t_xK9mP2?title=My+Post+Title&amp;author=Jane" /&gt;</code></pre>
+
+  <h3>Template variable syntax</h3>
+  <p>In Liquid (Jekyll/Eleventy):</p>
+  <pre><code>&lt;meta property="og:image"
+  content="https://pikzor.com/og/t_xK9mP2?title={{ page.title | url_encode }}&amp;author={{ page.author | url_encode }}" /&gt;</code></pre>
+
+  <p>In Go templates (Hugo):</p>
+  <pre><code>&lt;meta property="og:image"
+  content="https://pikzor.com/og/t_xK9mP2?title={{ .Title | urlize }}&amp;author={{ .Params.author | urlize }}" /&gt;</code></pre>
+
+  <!-- ── Next.js ── -->
+  <h2 id="nextjs">Next.js</h2>
+
+  <div class="tabs" id="nextjs-tabs">
+    <button class="tab-btn active" data-tab="app-router">App Router (13+)</button>
+    <button class="tab-btn" data-tab="pages-router">Pages Router</button>
+  </div>
+
+  <div id="app-router" class="tab-panel active">
+    <p>In <code>app/blog/[slug]/page.tsx</code>:</p>
+    <pre><code>import type { Metadata } from 'next'
+
+interface Props {
+  params: { slug: string }
+}
+
+export async function generateMetadata({ params }: Props): Promise&lt;Metadata&gt; {
+  const post = await getPost(params.slug)
+
+  const ogImageUrl = new URL('https://pikzor.com/og/t_xK9mP2')
+  ogImageUrl.searchParams.set('title', post.title)
+  ogImageUrl.searchParams.set('author', post.author)
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      images: [{ url: ogImageUrl.toString(), width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: [ogImageUrl.toString()],
+    },
+  }
+}</code></pre>
+  </div>
+
+  <div id="pages-router" class="tab-panel">
+    <p>In your blog post component:</p>
+    <pre><code>import Head from 'next/head'
+
+export default function BlogPost({ post }) {
+  const ogImageUrl =
+    `https://pikzor.com/og/t_xK9mP2` +
+    `?title=${encodeURIComponent(post.title)}` +
+    `&author=${encodeURIComponent(post.author)}`
+
+  return (
+    &lt;&gt;
+      &lt;Head&gt;
+        &lt;title&gt;{post.title}&lt;/title&gt;
+        &lt;meta property="og:title" content={post.title} /&gt;
+        &lt;meta property="og:description" content={post.excerpt} /&gt;
+        &lt;meta property="og:image" content={ogImageUrl} /&gt;
+        &lt;meta property="og:image:width" content="1200" /&gt;
+        &lt;meta property="og:image:height" content="630" /&gt;
+        &lt;meta name="twitter:card" content="summary_large_image" /&gt;
+        &lt;meta name="twitter:image" content={ogImageUrl} /&gt;
+      &lt;/Head&gt;
+      {/* post content */}
+    &lt;/&gt;
+  )
+}</code></pre>
+  </div>
+
+  <!-- ── JavaScript ── -->
+  <h2 id="javascript">JavaScript</h2>
+
+  <p>Build the URL in any JavaScript environment:</p>
+  <pre><code>function pikzorUrl(token, params) {
+  const url = new URL(`https://pikzor.com/og/${token}`)
+  for (const [key, value] of Object.entries(params)) {
+    if (value) url.searchParams.set(key, value)
+  }
+  return url.toString()
+}
+
+// Usage
+const imageUrl = pikzorUrl('t_xK9mP2', {
+  title: post.title,
+  author: post.author,
+  date: post.date,
+})</code></pre>
+
+  <!-- ── API: Render ── -->
+  <h2 id="api-render">POST /api/v1/render</h2>
+
+  <p>Programmatic rendering via API key. Returns JSON with a hosted image URL instead of the binary PNG.</p>
+
+  <div class="endpoint">
+    <span class="method post">POST</span>
+    <span class="path">/api/v1/render</span>
+  </div>
+
+  <h3>Request headers</h3>
+  <pre><code>Authorization: Bearer sk_live_&lt;your-api-key&gt;
+Content-Type: application/json</code></pre>
+
+  <h3>Request body</h3>
+  <pre><code>{
+  "templateId": "og-gradient",
+  "brandColor": "#3B82F6",
+  "title": "My Post Title",
+  "author": "Jane Doe",
+  "date": "April 5, 2026"
+}</code></pre>
+
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>templateId</code></td><td>string</td><td>yes</td><td>One of the 5 template IDs</td></tr>
+      <tr><td><code>brandColor</code></td><td>string</td><td>no</td><td>6-digit hex, e.g. <code>#3B82F6</code></td></tr>
+      <tr><td><code>title</code></td><td>string</td><td>no</td><td>Main heading text</td></tr>
+      <tr><td><code>author</code></td><td>string</td><td>no</td><td>Shown in card footer</td></tr>
+      <tr><td><code>date</code></td><td>string</td><td>no</td><td>Shown in card footer</td></tr>
+      <tr><td><code>description</code></td><td>string</td><td>no</td><td>Subtitle (og-light template only)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Response</h3>
+  <pre><code>{
+  "url": "https://pikzor.com/images/api/a1b2c3d4e5f6.png",
+  "cached": false,
+  "width": 1200,
+  "height": 630
+}</code></pre>
+
+  <h3>curl example</h3>
+  <pre><code>curl -X POST https://pikzor.com/api/v1/render \
+  -H "Authorization: Bearer sk_live_your_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "templateId": "og-gradient",
+    "brandColor": "#6366f1",
+    "title": "Hello from curl",
+    "author": "Jane Doe"
+  }'</code></pre>
+
+  <!-- ── Auth ── -->
+  <h2 id="auth">Authentication</h2>
+
+  <h3>Signup</h3>
+  <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/signup</span></div>
+  <pre><code>{ "email": "you@example.com", "password": "mypassword" }
+// → { "token": "eyJ...", "user": { "id": "...", "email": "...", "plan": "free" } }</code></pre>
+
+  <h3>Login</h3>
+  <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/login</span></div>
+  <pre><code>{ "email": "you@example.com", "password": "mypassword" }
+// → { "token": "eyJ...", "user": { ... } }</code></pre>
+
+  <h3>Get current user</h3>
+  <div class="endpoint"><span class="method get">GET</span><span class="path">/auth/me</span></div>
+  <pre><code>// Header: Authorization: Bearer &lt;jwt&gt;
+// → { "id": "...", "email": "...", "plan": "free", "brand_color": "#3B82F6" }</code></pre>
+
+  <h3>Generate API key</h3>
+  <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/api-key</span></div>
+  <pre><code>{ "name": "My App" }
+// → { "key": "sk_live_...", "prefix": "sk_live_12345", "warning": "Save this key..." }</code></pre>
+
+  <div class="callout callout-warn">
+    <strong>Important:</strong> API keys are shown exactly once. Store them securely — you cannot retrieve them later.
+  </div>
+
+  <h3>List API keys</h3>
+  <div class="endpoint"><span class="method get">GET</span><span class="path">/auth/api-keys</span></div>
+
+  <h3>Delete API key</h3>
+  <div class="endpoint"><span class="method del">DELETE</span><span class="path">/auth/api-key/:id</span></div>
+
+  <h3>Update brand settings</h3>
+  <div class="endpoint"><span class="method patch">PATCH</span><span class="path">/auth/brand</span></div>
+  <pre><code>{ "brandColor": "#6366f1", "logoUrl": "https://example.com/logo.png" }</code></pre>
+
+  <!-- ── Setup ── -->
+  <h2 id="setup">Setup Endpoints</h2>
+
+  <p>Setup endpoints create the short token URLs (<code>/og/t_xK9mP2</code>) that power your OG images.</p>
+
+  <h3>Create a token</h3>
+  <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/setup</span></div>
+  <pre><code>{
+  "templateId": "og-gradient",
+  "brandColor": "#3B82F6",
+  "logoUrl": "https://example.com/logo.png",
+  "domain": "myblog.com",
+  "label": "Blog posts"
+}
+// → { "token": "t_xK9mP2", "url": "https://pikzor.com/og/t_xK9mP2?title=Your+Title", "id": "..." }</code></pre>
+
+  <h3>List your tokens</h3>
+  <div class="endpoint"><span class="method get">GET</span><span class="path">/auth/setup</span></div>
+
+  <h3>Delete a token</h3>
+  <div class="endpoint"><span class="method del">DELETE</span><span class="path">/auth/setup/:id</span></div>
+
+  <!-- ── Usage ── -->
+  <h2 id="usage">Usage Endpoint</h2>
+
+  <div class="endpoint"><span class="method get">GET</span><span class="path">/auth/usage</span></div>
+  <pre><code>// → {
+//   "used": 12,
+//   "cached": 88,
+//   "limit": 50,
+//   "plan": "free",
+//   "month": "2026-04"
+// }</code></pre>
+
+  <p><code>limit</code> is <code>null</code> for unlimited plans. <code>used</code> counts only fresh renders (cache hits are free and don't count toward the limit).</p>
+
+  <!-- ── Templates ── -->
+  <h2 id="templates">Templates</h2>
+
+  <table>
+    <thead><tr><th>ID</th><th>Name</th><th>Best for</th></tr></thead>
+    <tbody>
+      <tr><td><code>og-blog-minimal</code></td><td>Minimal</td><td>Clean, text-heavy blogs</td></tr>
+      <tr><td><code>og-gradient</code></td><td>Gradient</td><td>Visual, modern tech blogs</td></tr>
+      <tr><td><code>og-split</code></td><td>Split</td><td>Corporate or business blogs</td></tr>
+      <tr><td><code>og-bold</code></td><td>Bold</td><td>High-impact announcements</td></tr>
+      <tr><td><code>og-light</code></td><td>Light</td><td>Lightweight, readable design</td></tr>
+    </tbody>
+  </table>
+
+  <p>Preview any template without a token:</p>
+  <pre><code>GET /og/test?template=og-gradient&title=Preview+Title&author=Jane&brandColor=%236366f1</code></pre>
+
+  <!-- ── Parameters ── -->
+  <h2 id="params">URL Parameters</h2>
+
+  <table>
+    <thead><tr><th>Param</th><th>Description</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>title</code></td><td>Main heading</td><td><code>My+Blog+Post</code></td></tr>
+      <tr><td><code>author</code></td><td>Author name in footer</td><td><code>Jane+Doe</code></td></tr>
+      <tr><td><code>date</code></td><td>Date in footer</td><td><code>April+5%2C+2026</code></td></tr>
+      <tr><td><code>description</code></td><td>Subtitle (og-light only)</td><td><code>A+short+desc</code></td></tr>
+      <tr><td><code>brandColor</code></td><td>Override brand color (test endpoint only)</td><td><code>%236366f1</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    Always use <code>encodeURIComponent()</code> in JavaScript or <code>url_encode</code> in template engines to avoid broken URLs for titles with special characters.
+  </div>
+
+  <!-- ── Plans ── -->
+  <h2 id="plans">Plans &amp; Limits</h2>
+
+  <table>
+    <thead><tr><th>Plan</th><th>Fresh renders/month</th><th>Rate limit</th><th>Watermark</th></tr></thead>
+    <tbody>
+      <tr><td>Free</td><td>50</td><td>10 req/min</td><td>Yes</td></tr>
+      <tr><td>Starter</td><td>1,000</td><td>30 req/min</td><td>No</td></tr>
+      <tr><td>Pro</td><td>5,000</td><td>60 req/min</td><td>No</td></tr>
+      <tr><td>Business</td><td>Unlimited</td><td>60 req/min</td><td>No</td></tr>
+    </tbody>
+  </table>
+
+  <p>Cache hits are always free and don't count toward your monthly limit. The first render generates the image; all subsequent requests return the cached version instantly.</p>
+
+  <p>When you exceed your monthly limit, the API returns <code>402 Payment Required</code>:</p>
+  <pre><code>{
+  "error": "Monthly render limit reached",
+  "limit": 50,
+  "used": 50,
+  "upgrade_url": "/pricing"
+}</code></pre>
+
+  <!-- ── Caching ── -->
+  <h2 id="caching">Caching</h2>
+
+  <p>Pikzor uses a two-layer cache:</p>
+  <ol>
+    <li><strong>Redis</strong> — hot cache for frequently requested images</li>
+    <li><strong>Filesystem</strong> — persistent storage at <code>/images/&lt;namespace&gt;/&lt;hash&gt;.png</code></li>
+  </ol>
+
+  <p>Cache keys are derived from a SHA-256 hash of the template token + sorted parameters. This means:</p>
+  <ul>
+    <li>Parameter order doesn't matter: <code>?title=A&amp;author=B</code> = <code>?author=B&amp;title=A</code></li>
+    <li>Changing any parameter generates a new image</li>
+    <li>Free and paid renders are cached separately (to prevent serving watermarked images after upgrade)</li>
+  </ul>
+
+  <p>The <code>X-Cache</code> response header tells you whether the image was served from cache (<code>HIT</code>) or freshly rendered (<code>MISS</code>).</p>
+
+</main>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tabs').forEach(tabGroup => {
+    tabGroup.addEventListener('click', e => {
+      const btn = e.target.closest('.tab-btn');
+      if (!btn) return;
+      const tabId = btn.dataset.tab;
+      tabGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Show the corresponding panel (sibling elements after tabs)
+      let sibling = tabGroup.nextElementSibling;
+      while (sibling && sibling.classList.contains('tab-panel')) {
+        sibling.classList.toggle('active', sibling.id === tabId);
+        sibling = sibling.nextElementSibling;
+      }
+    });
+  });
+
+  // Active sidebar link on scroll
+  const sections = document.querySelectorAll('h2[id]');
+  const links    = document.querySelectorAll('.sidebar a[href^="#"]');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.sidebar a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
