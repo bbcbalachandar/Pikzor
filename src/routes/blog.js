@@ -23,6 +23,28 @@ function parseFrontmatter(raw) {
   return { meta, content: match[2] };
 }
 
+// ── Extract title + description from markdown when no frontmatter ─────────────
+function extractFromMarkdown(content) {
+  const lines = content.split('\n');
+  let title = '';
+  let description = '';
+
+  for (const line of lines) {
+    if (!title && line.startsWith('# ')) {
+      title = line.slice(2).trim();
+      continue;
+    }
+    if (title && !description) {
+      const text = line.trim();
+      if (text && !text.startsWith('#')) {
+        description = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').slice(0, 160);
+        break;
+      }
+    }
+  }
+  return { title, description };
+}
+
 // ── Load all posts ────────────────────────────────────────────────────────────
 function loadPosts() {
   if (!fs.existsSync(POSTS_DIR)) return [];
@@ -32,8 +54,16 @@ function loadPosts() {
     .map(file => {
       const slug = file.replace(/\.md$/, '');
       const raw  = fs.readFileSync(path.join(POSTS_DIR, file), 'utf8');
-      const { meta } = parseFrontmatter(raw);
-      return { slug, ...meta };
+      const { meta, content } = parseFrontmatter(raw);
+      const extracted = extractFromMarkdown(content);
+      return {
+        slug,
+        title:       meta.title       || extracted.title       || slug,
+        description: meta.description || extracted.description || '',
+        date:        meta.date        || '',
+        tag:         meta.tag         || '',
+        author:      meta.author      || 'Pikzor Team',
+      };
     })
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 }
@@ -136,10 +166,11 @@ router.get('/:slug', (req, res) => {
   const raw  = fs.readFileSync(file, 'utf8');
   const { meta, content } = parseFrontmatter(raw);
   const html = marked.parse(content);
+  const extracted = extractFromMarkdown(content);
 
-  const title   = meta.title   || slug;
-  const desc    = meta.description || '';
-  const author  = meta.author  || 'Pikzor Team';
+  const title   = meta.title       || extracted.title       || slug;
+  const desc    = meta.description || extracted.description || '';
+  const author  = meta.author      || 'Pikzor Team';
   const date    = meta.date    || '';
 
   const ogUrl = new URL(`${config.baseUrl}/og/test`);
