@@ -141,7 +141,7 @@ router.get('/', (_req, res) => {
       <a href="/docs">Docs</a>
       <a href="/blog">Blog</a>
       <a href="/checker">OG Checker</a>
-      <a href="/dashboard.html">Dashboard</a>
+      <a href="/dashboard">Dashboard</a>
     </div>
   </nav>
   <main class="page">
@@ -166,7 +166,7 @@ router.get('/:slug', (req, res) => {
   const raw  = fs.readFileSync(file, 'utf8');
   const { meta, content } = parseFrontmatter(raw);
   // Strip leading H1 — page template already renders the title above the body
-  const bodyContent = content.replace(/^#[^\n]+\n?/, '');
+  const bodyContent = content.replace(/^# [^\n\r]+\r?\n?/, '');
   const html = marked.parse(bodyContent);
   const extracted = extractFromMarkdown(content);
 
@@ -261,7 +261,7 @@ router.get('/:slug', (req, res) => {
       <a href="/docs">Docs</a>
       <a href="/blog">Blog</a>
       <a href="/checker">OG Checker</a>
-      <a href="/dashboard.html">Dashboard</a>
+      <a href="/dashboard">Dashboard</a>
     </div>
   </nav>
   <main class="post">
