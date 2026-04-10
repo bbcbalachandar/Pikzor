@@ -140,7 +140,7 @@ router.get('/', (_req, res) => {
     <div class="nav-links">
       <a href="/docs">Docs</a>
       <a href="/blog">Blog</a>
-      <a href="/checker.html">OG Checker</a>
+      <a href="/checker">OG Checker</a>
       <a href="/dashboard.html">Dashboard</a>
     </div>
   </nav>
@@ -165,7 +165,9 @@ router.get('/:slug', (req, res) => {
 
   const raw  = fs.readFileSync(file, 'utf8');
   const { meta, content } = parseFrontmatter(raw);
-  const html = marked.parse(content);
+  // Strip leading H1 — page template already renders the title above the body
+  const bodyContent = content.replace(/^#[^\n]+\n?/, '');
+  const html = marked.parse(bodyContent);
   const extracted = extractFromMarkdown(content);
 
   const title   = meta.title       || extracted.title       || slug;
@@ -174,9 +176,10 @@ router.get('/:slug', (req, res) => {
   const date    = meta.date    || '';
 
   const ogUrl = new URL(`${config.baseUrl}/og/test`);
-  ogUrl.searchParams.set('template', 'og-gradient');
+  ogUrl.searchParams.set('template', 'og-blog-minimal');
   ogUrl.searchParams.set('title', title);
   ogUrl.searchParams.set('author', author);
+  ogUrl.searchParams.set('brand_color', '#6366f1');
   if (date) ogUrl.searchParams.set('date', date);
 
   res.send(`<!DOCTYPE html>
@@ -257,7 +260,7 @@ router.get('/:slug', (req, res) => {
     <div class="nav-links">
       <a href="/docs">Docs</a>
       <a href="/blog">Blog</a>
-      <a href="/checker.html">OG Checker</a>
+      <a href="/checker">OG Checker</a>
       <a href="/dashboard.html">Dashboard</a>
     </div>
   </nav>

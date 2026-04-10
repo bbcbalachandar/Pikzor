@@ -97,7 +97,7 @@ The concept is simple. Instead of pointing your meta tag at a static file:
 You point it at a URL that generates the image dynamically:
 
 ```html
-<meta property="og:image" content="https://api.example.com/og?title=How+We+Grew+to+10K+Users&author=Sarah+Chen&theme=dark" />
+<meta property="og:image" content="https://pikzor.com/og?title=How+We+Grew+to+10K+Users&author=Sarah+Chen&theme=dark" />
 ```
 
 When Twitter or LinkedIn hits that URL, the service renders a beautiful card image with your title and branding, and returns the PNG. The image is cached, so subsequent requests are instant.
@@ -115,12 +115,12 @@ If you have a static HTML site, you set the meta tag manually per page — but t
 ```html
 <head>
   <meta property="og:image" 
-    content="https://api.example.com/og?title=My+Blog+Post&author=John&color=3B82F6" />
+    content="https://pikzor.com/og?title=My+Blog+Post&author=John&color=3B82F6" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" 
-    content="https://api.example.com/og?title=My+Blog+Post&author=John&color=3B82F6" />
+    content="https://pikzor.com/og?title=My+Blog+Post&author=John&color=3B82F6" />
 </head>
 ```
 
@@ -133,7 +133,7 @@ With Next.js, you can set OG images dynamically using the metadata export in you
 export async function generateMetadata({ params }) {
   const post = await getPost(params.slug);
   
-  const ogImageUrl = `https://api.example.com/og?${new URLSearchParams({
+  const ogImageUrl = `https://pikzor.com/og?${new URLSearchParams({
     title: post.title,
     author: post.author,
     date: post.date,
@@ -179,7 +179,7 @@ function getOGImageUrl(title, author) {
     color: '3B82F6',
     theme: 'dark'
   });
-  return `https://api.example.com/og?${params.toString()}`;
+  return `https://pikzor.com/og?${params.toString()}`;
 }
 
 // Use it in your template/layout
