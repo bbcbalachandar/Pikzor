@@ -51,8 +51,8 @@ router.post('/signup', byIp, async (req, res) => {
     res.status(201).json({ token, user: safeUser(user) });
 
     // Fire-and-forget welcome email
-    const email = require('../services/email');
-    email.sendWelcome(user.email).catch(() => {});
+    const emailService = require('../services/email');
+    emailService.sendWelcome(user.email).catch(() => {});
   } catch (err) {
     const logger = require('../utils/logger');
     logger.error('[auth/signup]', err);
