@@ -169,7 +169,7 @@ router.get('/:token', byIp, async (req, res) => {
         used:        usage.render_count,
         limit,
         plan:        row.user_plan,
-        upgrade_url: '/pricing',
+        upgrade_url: '/#pricing',
       });
     }
 

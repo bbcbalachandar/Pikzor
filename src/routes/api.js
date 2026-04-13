@@ -81,7 +81,7 @@ router.post('/render', requireApiKey, byUser, async (req, res) => {
         used:        usage.render_count,
         limit,
         plan:        req.user.plan,
-        upgrade_url: '/pricing',
+        upgrade_url: '/#pricing',
       });
     }
 

@@ -109,8 +109,37 @@ app.use((err, req, res, _next) => {
   res.status(500).json(payload);
 });
 
+// ── Template seeding ──────────────────────────────────────────────────────────
+// Sync filesystem templates → DB so /auth/setup can validate templateId and
+// user_templates foreign-key constraint is satisfied.
+function seedTemplates() {
+  try {
+    const { listTemplates } = require('./services/templates');
+    const { upsertTemplate } = require('./db/db');
+    const templates = listTemplates();
+    for (const meta of templates) {
+      upsertTemplate.run({
+        id:          meta.id,
+        name:        meta.name        || meta.id,
+        category:    meta.category    || 'blog',
+        description: meta.description || '',
+        html_path:   path.join('templates', meta.id, 'template.html'),
+        variables:   JSON.stringify(meta.variables || []),
+        width:       meta.width       || 1200,
+        height:      meta.height      || 630,
+        is_public:   meta.is_public !== false ? 1 : 0,
+      });
+    }
+    logger.info(`[server] seeded ${templates.length} template(s) into DB`);
+  } catch (err) {
+    logger.error('[server] template seeding failed', err);
+  }
+}
+
 // ── Startup ───────────────────────────────────────────────────────────────────
 async function start() {
+  seedTemplates();
+
   try {
     await renderer.getBrowser();
     logger.info('[server] renderer ready');

@@ -142,6 +142,17 @@ router.post('/setup', requireJwt, (req, res) => {
   }
 
   const user  = db.getUserById.get(req.user.id);
+
+  // Free plan: max 1 OG endpoint
+  if (user.plan === 'free') {
+    const existing = db.listUserTemplates.all(req.user.id);
+    if (existing.length >= 1) {
+      return res.status(403).json({
+        error: 'Free plan is limited to 1 OG endpoint. Upgrade to create more.',
+        upgrade_url: '/#pricing',
+      });
+    }
+  }
   const id    = crypto.randomUUID();
   let   token = generateShortToken();
 
