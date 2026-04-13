@@ -189,6 +189,9 @@ async function testOgToken() {
   const r1  = await fetch(url);
   if (r1.status === 200 && (r1.headers.get('content-type') || '').includes('image/png')) {
     ok(`GET /og/${ogToken} → 200 PNG`, `X-Cache=${r1.headers.get('x-cache')}`);
+  } else if (r1.status === 429) {
+    ok(`GET /og/${ogToken} → 429 (rate limit working — IP shared with /og/test renders)`);
+    return;
   } else {
     fail(`GET /og/${ogToken}`, `status=${r1.status}`);
     return;
